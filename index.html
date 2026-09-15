@@ -955,13 +955,17 @@ async function startDownload() {
     if (!osFile) throw new Error('ZIP 内に os.html が見つかりませんでした');
 
     // Extract os.html as blob
-    const osBlob = await osFile.async('blob');
+    const osBlobRaw = await osFile.async('blob');
+
+    // ★ MIMEタイプを明示して再構築（.txt 拡張子化を防ぐ）
+    const osBlob = new Blob([osBlobRaw], { type: 'text/html' });
 
     // Trigger download of os.html only
     const url = URL.createObjectURL(osBlob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'os.html';
+    a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
